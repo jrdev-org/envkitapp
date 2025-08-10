@@ -1,29 +1,107 @@
-# Create T3 App
+# envkit
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+**envkit** is a centralized environment variable management service with Git branch support.
+It allows developers to securely store, manage, and sync environment variables across multiple devices, projects, and branches — accessible via a web dashboard, CLI, or NPM package.
 
-## What's next? How do I make an app with this?
+---
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+* **Web Dashboard** – Manage your environment variables with a clean and intuitive UI.
+* **Git Branch Support** – Store branch-specific variables automatically.
+* **CLI Tool** – Pull, push, and authenticate your environment variables from the terminal.
+* **NPM Package** – Access your variables directly in your code.
+* **End-to-End Encryption** – Your keys are encrypted before storage.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+---
 
-## Learn More
+## Tech Stack
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+* **Frontend**: Next.js, TailwindCSS
+* **Backend**: Convex (database + API layer)
+* **CLI**: Node.js, Commander
+* **Package**: TypeScript
+* **Monorepo**: PNPM + Turborepo
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+---
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Getting Started
 
-## How do I deploy this?
+### Prerequisites
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+* Node.js 18+
+* PNPM 9+
+* Convex CLI (`npm install -g convex`)
+
+---
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/envkit.git
+cd envkit
+```
+
+---
+
+### 2. Install dependencies
+
+```bash
+pnpm install
+```
+
+---
+
+### 3. Start development servers
+
+```bash
+# Start Convex
+cd convex
+convex dev
+
+# Start web dashboard
+cd web/
+pnpm dev
+```
+
+---
+
+### 4. Build all packages
+
+```bash
+pnpm build
+```
+
+---
+
+## Scripts
+
+From the root directory:
+
+```bash
+pnpm dev       # Start all dev servers
+pnpm build     # Build all packages/apps
+pnpm lint      # Lint all code
+```
+
+---
+
+## Pricing Model Idea
+
+Since envkit primarily stores small text values (environment variables), pricing could be based on **reads/accesses per month**, with a very low baseline cost for small teams and personal use.
+
+Example:
+
+* Free Tier – 500 reads/month, 3 projects
+* Pro Tier – \$2/month, 50k reads/month
+* Team Tier – \$5/month, 250k reads/month
+
+---
+
+## Security
+
+* Environment variables are encrypted before being stored.
+* Branch-specific isolation to prevent accidental leakage.
+* Optional IP-based access control.
+* Audit logs for variable changes.
+
