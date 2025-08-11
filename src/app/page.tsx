@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="h-screen w-full snap-y overflow-y-scroll scroll-smooth">
@@ -6,34 +8,34 @@ export default function HomePage() {
         <div className="flex items-center space-x-6 text-white">
           <span className="text-2xl font-bold">EnvKit</span>
           <nav className="hidden items-center space-x-4 text-sm text-white md:flex">
-            <a href="#features" className="hover:underline">
+            <Link href="#features" className="hover:underline">
               Features
-            </a>
-            <a href="#docs" className="hover:underline">
+            </Link>
+            <Link href="#docs" className="hover:underline">
               Docs
-            </a>
-            <a href="#pricing" className="hover:underline">
+            </Link>
+            <Link href="#pricing" className="hover:underline">
               Pricing
-            </a>
-            <a href="#why" className="hover:underline">
+            </Link>
+            <Link href="#why" className="hover:underline">
               Why
-            </a>
+            </Link>
           </nav>
         </div>
 
         <div className="flex items-center space-x-3">
-          <a
-            href="#"
+          <Link
+            href="/dashboard"
             className="hidden rounded-full bg-white px-4 py-2 font-semibold text-blue-600 hover:bg-gray-100 md:inline-block"
           >
             Sign in
-          </a>
-          <a
+          </Link>
+          <Link
             href="#"
             className="rounded-full bg-white px-4 py-2 font-semibold text-blue-600 hover:bg-gray-100"
           >
             Get Started
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -50,18 +52,18 @@ export default function HomePage() {
           </p>
 
           <div className="flex justify-center gap-4">
-            <a
+            <Link
               href="#quick-setup"
               className="rounded-full bg-white px-6 py-3 font-semibold text-blue-600 hover:bg-gray-100"
             >
               Quick Setup
-            </a>
-            <a
+            </Link>
+            <Link
               href="#features"
               className="rounded-full border border-white/30 bg-white/20 px-6 py-3 font-semibold text-white hover:bg-white/10"
             >
               Explore Features
-            </a>
+            </Link>
           </div>
 
           <p className="mt-6 text-sm text-white/90">
@@ -205,12 +207,12 @@ console.log(env['my-app:feature.DATABASE_URL'])`}
           Join thousands of developers who trust EnvKit for their configuration
           management.
         </p>
-        <a
+        <Link
           href="#"
           className="rounded-full bg-white px-6 py-3 font-semibold text-blue-600 hover:bg-gray-100"
         >
           Get Started for Free
-        </a>
+        </Link>
       </section>
 
       {/* Footer */}

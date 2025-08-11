@@ -49,6 +49,7 @@ export default function SignIn() {
                 provider: "github",
                 callbackURL: "/dashboard",
                 errorCallbackURL: "/",
+                newUserCallbackURL: "/dashboard/onboarding",
               },
               {
                 onRequest: () => setLoading(true),

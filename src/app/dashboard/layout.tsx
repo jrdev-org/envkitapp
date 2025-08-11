@@ -1,5 +1,7 @@
+"use client";
+
 import { Navigation as Navbar } from "@/components/nav";
-import { auth } from "@/lib/auth";
+import { useSession } from "@/lib/auth-client";
 import {
   Activity,
   FolderOpen,
@@ -8,16 +10,21 @@ import {
   Settings,
   Users,
 } from "lucide-react";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, type ReactNode } from "react";
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { data, isPending } = useSession();
+
+  useEffect(() => {
+    if (!isPending && !data?.session) {
+      router.push("/auth/sign-in");
+      return;
+    }
+  }, [isPending, data, router]);
+
   const links = [
     {
       url: "/dashboard",
@@ -51,17 +58,26 @@ export default async function DashboardLayout({
     },
   ];
 
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  if (isPending) {
+    return <div>Loading...</div>; // Or a more appropriate loader
+  }
 
-  if (!session) {
-    redirect("/auth/sign-in");
+  if (!data?.session) {
+    return (
+      <div>
+        <h2>
+          You might not be authenticated, please head to{" "}
+          <Link className="text-blue-900" href={"/auth/sign-in"}>
+            auth
+          </Link>
+        </h2>
+      </div>
+    );
   }
 
   return (
     <div className="h-screen bg-gray-100 text-black">
-      <Navbar session={session} />
+      <Navbar session={data} />
       <div className="flex h-full">
         <aside className="flex w-64 flex-col gap-3 bg-white shadow-md">
           {links.map((link, index) => (
