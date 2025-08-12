@@ -16,8 +16,17 @@ export default function OnboardingPage() {
   >(null);
   const createNewUser = useMutation(api.users.create);
 
+  if (!data) {
+    console.log("Not authenticated");
+    return (
+      <div>
+        <h2>Please reload the page to fetch the user and session data</h2>
+      </div>
+    );
+  }
+
   useEffect(() => {
-    if (data?.user) {
+    if (data.user) {
       createNewUser({
         name: data.user.name,
         authId: data.user.id,
@@ -31,7 +40,7 @@ export default function OnboardingPage() {
           console.error("Error creating user:", err);
         });
     }
-  }, [data?.user, createNewUser]);
+  }, [data.user, createNewUser]);
 
   if (isPending) {
     console.log("loading ...");
@@ -50,18 +59,9 @@ export default function OnboardingPage() {
     );
   }
 
-  if (!data) {
-    console.log("Not authenticated");
-    return (
-      <div>
-        <h2>Please reload the page to fetch the user and session data</h2>
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1>Hello {newUser ? "New User Onboarded" : "Creating User..."}</h1>
+      <h1>Hello {newUser ? `${data.user.name}` : "Creating User..."}</h1>
       <p>
         Thanks for onboarding, you can now continue to the{" "}
         <Link className="text-blue-600" href={"/dashboard"}>

@@ -44,15 +44,20 @@ export default function DashboardPage() {
   }
 
   const createNewProject = useMutation(api.projects.create);
-  const user = useQuery(api.users.getByAuthId, {
-    authId: data.user.id,
-  });
-
-  if (!user) {
-    console.warn("Failed to get user data from the database");
-    return <div>Reload the page to fetch user data</div>;
+  const authId = data?.user?.id;
+  const user = useQuery(api.users.getByAuthId, authId ? { authId } : "skip");
+  if (user === undefined) {
+    // Still loading from Convex
+    return <div>Loading user…</div>;
   }
-
+  if (user === null) {
+    console.warn("No user found for authId", authId);
+    return (
+      <div>
+        We couldn’t find your user record. Please sign out and sign in again.
+      </div>
+    );
+  }
   function createProject(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
