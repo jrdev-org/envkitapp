@@ -7,7 +7,7 @@ export const create = mutation({
     const existing = await ctx.db
       .query("projects")
       .withIndex("by_owner_and_name", (q) =>
-        q.eq("name", args.name).eq("ownerId", args.userId),
+        q.eq("ownerId", args.userId).eq("name", args.name),
       )
       .first();
 
@@ -33,5 +33,13 @@ export const list = query({
       .withIndex("by_owner", (q) => q.eq("ownerId", args.userId))
       .collect();
     return userProjects;
+  },
+});
+
+export const get = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, args) => {
+    const project = await ctx.db.get(args.projectId);
+    return project;
   },
 });

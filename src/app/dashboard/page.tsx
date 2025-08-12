@@ -3,7 +3,6 @@
 import { useSession } from "@/lib/auth-client";
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { z } from "zod";
@@ -30,22 +29,26 @@ export default function DashboardPage() {
     return <div>Loading...</div>; // Or a more appropriate loader
   }
 
-  if (!data?.session) {
-    return (
-      <div>
-        <h2>
-          You might not be authenticated, please head to{" "}
-          <Link className="text-blue-900" href={"/auth/sign-in"}>
-            auth
-          </Link>
-        </h2>
-      </div>
-    );
-  }
+  // if (!data?.session) {
+  //   return (
+  //     <div>
+  //       <h2>
+  //         You might not be authenticated, please head to{" "}
+  //         <Link className="text-blue-900" href={"/auth/sign-in"}>
+  //           auth
+  //         </Link>
+  //       </h2>
+  //     </div>
+  //   );
+  // }
+  //
+  //
 
   const createNewProject = useMutation(api.projects.create);
   const authId = data?.user?.id;
-  const user = useQuery(api.users.getByAuthId, authId ? { authId } : "skip");
+  const user = useQuery(api.users.getByAuthId, {
+    authId: authId!,
+  });
   if (user === undefined) {
     // Still loading from Convex
     return <div>Loading user…</div>;
