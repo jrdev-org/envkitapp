@@ -1,16 +1,9 @@
 import { betterAuth } from "better-auth";
 import { env } from "@/env";
-import Database from "better-sqlite3";
-import { createClient } from "@libsql/client";
+import { sqliteDb, tursoDb } from "./db";
 
 // Decide which database to use
-const database =
-  env.NODE_ENV === "production"
-    ? createClient({
-        url: env.TURSO_DATABASE_URL,
-        authToken: env.TURSO_AUTH_TOKEN,
-      })
-    : new Database("./sqlite-auth.db");
+const database = env.NODE_ENV === "production" ? tursoDb : sqliteDb;
 
 export const auth = betterAuth({
   socialProviders: {
