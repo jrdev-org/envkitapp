@@ -46,7 +46,7 @@ export default function DashboardPage() {
 
   const createNewProject = useMutation(api.projects.create);
   const authId = data?.user?.id;
-  const user = useQuery(api.users.getByAuthId, {
+  const user = useQuery(api.users.get, {
     authId: authId!,
   });
   if (user === undefined) {

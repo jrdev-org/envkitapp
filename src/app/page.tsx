@@ -6,7 +6,9 @@ export default function HomePage() {
       {/* Navbar */}
       <header className="fixed top-6 right-0 left-0 z-50 flex items-center justify-between px-8">
         <div className="flex items-center space-x-6 text-white">
-          <span className="text-2xl font-bold">EnvKit</span>
+          <Link href="/" className="text-2xl font-bold">
+            .env<span className="text-gray-800">kit</span>
+          </Link>
           <nav className="hidden items-center space-x-4 text-sm text-white md:flex">
             <Link href="#features" className="hover:underline">
               Features
@@ -75,7 +77,7 @@ export default function HomePage() {
       {/* Why Use Envkit */}
       <section
         id="why"
-        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600"
+        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900"
       >
         <h2 className="mb-4 text-4xl font-bold">Why Use EnvKit?</h2>
         <p className="max-w-2xl text-center text-lg text-gray-50">
@@ -89,7 +91,7 @@ export default function HomePage() {
       {/* Quick Setup */}
       <section
         id="quick-setup"
-        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600"
+        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900"
       >
         <h2 className="mb-4 text-4xl font-bold">Quick Setup</h2>
 
@@ -122,7 +124,7 @@ console.log(env['my-app:feature.DATABASE_URL'])`}
       {/* Features */}
       <section
         id="features"
-        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600"
+        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900"
       >
         <h2 className="mb-4 text-4xl font-bold">Everything you need</h2>
         <p className="mb-6 max-w-3xl text-center text-lg text-gray-50">
@@ -160,7 +162,7 @@ console.log(env['my-app:feature.DATABASE_URL'])`}
       {/* How / Features (detailed) */}
       <section
         id="how"
-        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600"
+        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900"
       >
         <h2 className="mb-4 text-4xl font-bold">How It Works</h2>
         <ul className="max-w-3xl list-disc space-y-2 px-6 text-lg text-gray-50">
@@ -177,7 +179,7 @@ console.log(env['my-app:feature.DATABASE_URL'])`}
       {/* Pricing */}
       <section
         id="pricing"
-        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600"
+        className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900"
       >
         <h2 className="mb-4 text-4xl font-bold">Pricing</h2>
         <p className="mb-4 max-w-2xl text-center text-lg text-gray-50">
@@ -190,7 +192,7 @@ console.log(env['my-app:feature.DATABASE_URL'])`}
       </section>
 
       {/* Security */}
-      <section className="flex h-screen snap-start flex-col items-center justify-center bg-gray-600">
+      <section className="flex h-screen snap-start flex-col items-center justify-center bg-gray-900">
         <h2 className="mb-4 text-4xl font-bold">Security First</h2>
         <p className="max-w-2xl text-center text-lg text-gray-50">
           All environment variables are encrypted before leaving your device.

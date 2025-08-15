@@ -13,6 +13,8 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as cli from "../cli.js";
+import type * as devices from "../devices.js";
 import type * as projects from "../projects.js";
 import type * as users from "../users.js";
 import type * as variables from "../variables.js";
@@ -26,6 +28,8 @@ import type * as variables from "../variables.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  cli: typeof cli;
+  devices: typeof devices;
   projects: typeof projects;
   users: typeof users;
   variables: typeof variables;

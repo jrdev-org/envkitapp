@@ -6,9 +6,9 @@ import { useQuery } from "convex/react";
 
 export const ProjectDetails = ({ params }: { params: { id: string } }) => {
   const projectId = params.id as Id<"projects">;
+  const data = useQuery(api.variables.getProjectAndVars, { projectId });
 
   // Single call to fetch both project and variables
-  const data = useQuery(api.variables.getVarsandProject, { projectId });
 
   if (data === undefined) {
     return <div>Loading...</div>;
@@ -17,6 +17,8 @@ export const ProjectDetails = ({ params }: { params: { id: string } }) => {
   if (!data) {
     return <div>Project not found</div>;
   }
+
+  console.log(data);
 
   const { project, variables } = data;
 
