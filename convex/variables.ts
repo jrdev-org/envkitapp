@@ -14,7 +14,7 @@ export const get = query({
   },
 });
 
-export const getVarsandProject = query({
+export const getProjectAndVars = query({
   args: { projectId: v.id("projects") },
   handler: async (ctx, args) => {
     const project = await ctx.db.get(args.projectId);

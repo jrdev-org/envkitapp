@@ -17,14 +17,13 @@ export const create = mutation({
       return existingByAuth._id;
     }
 
-    // 2) De-dupe by normalized email.
     const existingByEmail = await ctx.db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
     if (existingByEmail !== null) {
       // Optionally patch missing authId if your schema permits:
-      // await ctx.db.patch(existingByEmail._id, { authId });
+      await ctx.db.patch(existingByEmail._id, { authId });
       return existingByEmail._id;
     }
 
@@ -37,7 +36,7 @@ export const create = mutation({
   },
 });
 
-export const getByAuthId = query({
+export const get = query({
   args: { authId: v.string() },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -45,5 +44,13 @@ export const getByAuthId = query({
       .withIndex("by_authId", (q) => q.eq("authId", args.authId))
       .first();
     return user;
+  },
+});
+
+///
+export const list = query({
+  args: {},
+  async handler(ctx, _args) {
+    return await ctx.db.query("users").collect();
   },
 });

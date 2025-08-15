@@ -14,7 +14,7 @@ export const create = mutation({
     if (existing !== null) {
       console.log(`Project exists: ${existing._id}`);
 
-      return existing;
+      return existing._id;
     }
 
     const newProjectId = await ctx.db.insert("projects", {
