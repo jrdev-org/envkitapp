@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { token, deviceId, port } = await req.json();
+  const { userId, deviceId, port, agent } = await req.json();
 
-  if (!token || !deviceId) {
+  if (!userId || !deviceId) {
     return NextResponse.json(
-      { error: "Missing token or deviceId" },
+      { error: "Missing userId or deviceId" },
       {
         status: 400,
       },
@@ -22,9 +22,12 @@ export async function POST(req: NextRequest) {
 
     // This runs server-side, so CORS to localhost:3001 won't block it
     const cliRes = await fetch(
-      `http://localhost:${port}/auth/${encodeURIComponent(token)}/${encodeURIComponent(deviceId)}`,
+      `http://localhost:${port}/auth/${encodeURIComponent(userId)}/${encodeURIComponent(deviceId)}`,
       {
         method: "POST",
+        headers: {
+          "User-Agent": agent ?? undefined,
+        },
       },
     );
 

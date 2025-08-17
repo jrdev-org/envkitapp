@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Terminal, Shield, Check, X, Loader2 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { getOrCreateUser } from "@/lib/user";
 
 interface DeviceInfo {
   deviceId: string;
@@ -54,15 +55,23 @@ export default function CLIAuthClient({
     setErrorMessage("");
 
     try {
+      // get the convexUser here
+      const user = await getOrCreateUser(
+        data.session.userId,
+        data.user.name,
+        data.user.name,
+      );
+
       // Instead of calling the CLI server directly from the browser (CORS issue),
       // we call our own Next.js API route, which will run on the server.
       const res = await fetch(`/api/cli/authorize`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: data.session.token,
+          userId: user,
           deviceId: deviceInfo.deviceId,
           port,
+          agent: data.session.userAgent,
         }),
       });
 
