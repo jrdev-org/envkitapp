@@ -1,422 +1,470 @@
 "use client";
 
-import Link from "next/link";
-import { useSession } from "@/lib/auth-client";
+import React from "react";
 import { motion } from "framer-motion";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vs } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import CheckerboardBG from "@/components/checkered-bg";
+import { Lock, Terminal, Users } from "lucide-react";
 
-const CLI_STEPS = [
-  {
-    title: "Authenticate",
-    description:
-      "Sign in to EnvKit and fetch your personal API token for secure variable access.",
-    code: `envkit auth login
-# Opening auth server at http://localhost:5200/cli/auth
-# ✓ Authentication successful! Token saved.`,
-    outcome:
-      "You now have a valid token stored locally, which will be used to securely authenticate all future CLI operations.",
-  },
-  {
-    title: "Initialize Project",
-    description: "Start by initializing envkit in your project.",
-    code: `? What do you want to do?
-  ❯ Create a new project
-    Link to an existing project
+function Heading({
+  size,
+  className,
+  children,
+}: {
+  size?: "xl" | "lg" | "md";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const Tag = size === "xl" ? "h1" : size === "lg" ? "h2" : "h3";
+  return <Tag className={className}>{children}</Tag>;
+}
 
-$ envkit init`,
-    outcome:
-      "This sets up the project configuration in your repo so EnvKit knows where to store and manage variables.",
-  },
-  {
-    title: "Link Project",
-    description:
-      "Choose an existing project to link your local workspace for push/pull operations.",
-    code: `envkit projects link
-# ? Select a project to link:
-#   ❯ my-web-app (prod, staging, dev)
-# ✓ Linked to 'my-web-app' project`,
-    outcome:
-      "Your local project is now tied to a specific remote environment, enabling synchronized pushes and pulls.",
-  },
-  {
-    title: "Push Variables",
-    description:
-      "Push your local environment variables to the linked remote project.",
-    code: `? Select stage
-  ❯ development
-    staging
-    production
+function Text({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <p className={className}>{children}</p>;
+}
 
-? Select env file to push
-  ❯ .env.local
-    .env
+function Card({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`rounded-md border border-slate-100 bg-white shadow ${
+        className || ""
+      }`.trim()}
+    >
+      {children}
+    </div>
+  );
+}
 
-$ envkit push`,
-    outcome:
-      "Your team can now access the exact same variables in the remote environment, keeping everything consistent.",
-  },
-  {
-    title: "Pull Variables",
-    description:
-      "Fetch remote variables from the linked project into your local environment.",
-    code: `? Select stage
-  ❯ development
-    staging
-    production
+function CardContent({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return <div className={className}>{children}</div>;
+}
 
-? Select env file to write
-  ❯ .env.local
-    .env
+function GhostButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const { className, children, ...rest } = props;
+  return (
+    <button
+      {...rest}
+      className={`inline-flex items-center rounded-md px-3 py-2 text-slate-700 hover:bg-slate-100 ${
+        className || ""
+      }`.trim()}
+    >
+      {children}
+    </button>
+  );
+}
 
-$ envkit pull`,
-    outcome:
-      "Your local .env file is updated with the latest variables, ensuring you are always in sync with remote changes.",
-  },
-  {
-    title: "Deploy & Use",
-    description:
-      "Once configured, your environment variables are synced and ready.",
-    code: `$ envkit deploy`,
-    outcome:
-      "Your team can now access the exact same variables in the remote environment, keeping everything consistent.",
-  },
-];
-
-// const CLI_STEPS = [
-//   {
-//     title: "Initialize Project",
-//     description: "Start by initializing envkit in your project.",
-//     code: `? What do you want to do?
-//   ❯ Create a new project
-//     Link to an existing project
-
-// $ envkit init`,
-//   },
-//   {
-//     title: "Push Environment Variables",
-//     description: "Upload environment variables to your chosen stage and file.",
-//     code: `? Select stage
-//   ❯ development
-//     staging
-//     production
-
-// ? Select env file to push
-//   ❯ .env.local
-//     .env
-
-// $ envkit push`,
-//   },
-//   {
-//     title: "Pull Environment Variables",
-//     description:
-//       "Download environment variables from the correct stage into a local file.",
-//     code: `? Select stage
-//   ❯ development
-//     staging
-//     production
-
-// ? Select env file to write
-//   ❯ .env.local
-//     .env
-
-// $ envkit pull`,
-//   },
-//   {
-//     title: "Deploy & Use",
-//     description:
-//       "Once configured, your environment variables are synced and ready.",
-//     code: `$ envkit deploy`,
-//   },
-// ];
-
-const FEATURES = [
-  {
-    title: "Branch-Aware Environments",
-    description:
-      "Automatically switch environment variables based on your Git branch. No more manual .env file swapping.",
-    icon: "🌳",
-  },
-  {
-    title: "Team Collaboration",
-    description:
-      "Share environment variables securely with your team. Everyone stays in sync without exposing secrets.",
-    icon: "👥",
-  },
-  {
-    title: "Powerful CLI",
-    description:
-      "Simple commands to push, pull, and manage variables. Integrates seamlessly into your existing workflow.",
-    icon: "⚡",
-  },
-  {
-    title: "Secure by Default",
-    description:
-      "End-to-end encryption ensures your secrets are safe. SOC 2 compliant infrastructure.",
-    icon: "🔒",
-  },
-  {
-    title: "Framework Agnostic",
-    description:
-      "Works with any framework or language. From React to Django, we've got you covered.",
-    icon: "🛠️",
-  },
-  {
-    title: "Real-time Sync",
-    description:
-      "Changes propagate instantly across your team. No more 'works on my machine' issues.",
-    icon: "🔄",
-  },
-];
-
-const WHY_REASONS = [
-  {
-    title: "Stop the .env Chaos",
-    description:
-      "No more Slack messages asking for environment variables. No more outdated .env.example files. No more onboarding nightmares.",
-  },
-  {
-    title: "Security First",
-    description:
-      "Your secrets never touch version control. Encrypted at rest and in transit. Audit logs for compliance.",
-  },
-  {
-    title: "Developer Experience",
-    description:
-      "Built by developers, for developers. Simple CLI that feels natural. Zero config for most use cases.",
-  },
-  {
-    title: "Scale with Confidence",
-    description:
-      "From side projects to enterprise. Multi-environment support with granular permissions and team management.",
-  },
-];
+function PrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const { className, children, ...rest } = props;
+  return (
+    <button
+      {...rest}
+      className={`inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 font-medium text-white shadow hover:bg-indigo-700 ${
+        className || ""
+      }`.trim()}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function HomePage() {
-  const { data, isPending, error } = useSession();
-
   return (
-    <main className="w-full snap-y overflow-y-scroll scroll-smooth bg-white text-gray-900">
-      {/* Navbar */}
-      <header className="fixed top-6 right-0 left-0 z-50 flex items-center justify-between px-8">
-        <div className="flex items-center space-x-6 text-gray-900">
-          <Link href="/" className="text-2xl font-bold">
-            .env<span className="text-gray-500">kit</span>
-          </Link>
-        </div>
-        <div className="flex items-center space-x-3">
-          {!data ? (
-            <Link
-              href="/signin"
-              className="rounded-full bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
-            >
-              Sign In
-            </Link>
-          ) : (
-            <Link
-              href="/dashboard"
-              className="rounded-full bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
-            >
-              Dashboard
-            </Link>
-          )}
-        </div>
-      </header>
+    <main className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900">
+      <div className="mx-auto max-w-6xl px-4 py-16">
+        {/* Header / Nav */}
+        <header className="mb-12 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-indigo-600 font-semibold text-white shadow">
+              EK
+            </div>
+            <div>
+              <div className="text-lg font-semibold">envkit</div>
+              <div className="text-xs text-slate-500">
+                secure envs, simplified
+              </div>
+            </div>
+          </div>
 
-      {/* Hero */}
-      <section className="relative flex h-screen snap-start items-center justify-center overflow-hidden bg-white/30">
-        <CheckerboardBG size={18} base="#ffffff" alt="#eef2ff" opacity={1} />
-        <div className="max-w-3xl px-6 text-center">
-          <h1 className="mb-4 text-6xl font-bold">
-            Environment Variables Made Simple
-          </h1>
-          <p className="mb-6 text-xl text-gray-700">
-            Centralized environment variable management with branch-aware
-            support and a powerful CLI.
-          </p>
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-500"
+          <nav className="flex items-center gap-3">
+            <GhostButton
+              className="hidden sm:inline-flex"
+              onClick={() => (location.hash = "#features")}
+            >
+              Features
+            </GhostButton>
+            <GhostButton
+              className="hidden sm:inline-flex"
+              onClick={() => (location.hash = "#cli")}
+            >
+              CLI
+            </GhostButton>
+            <GhostButton
+              className="hidden sm:inline-flex"
+              onClick={() => (location.hash = "#pricing")}
+            >
+              Pricing
+            </GhostButton>
+            <PrimaryButton onClick={() => (location.href = "/docs")}>
+              Get Started
+            </PrimaryButton>
+          </nav>
+        </header>
+
+        {/* Hero */}
+        <section className="mb-16 grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+          <motion.div
+            initial={{ x: -24, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.45 }}
           >
-            Get Started
-          </Link>
-        </div>
-      </section>
+            <Heading size="xl" className="mb-4 text-4xl font-bold">
+              Manage environment variables securely — locally or team-wide
+            </Heading>
+            <Text className="mb-6 max-w-xl text-slate-600">
+              envkit is a developer-first environment manager. Create, sync, and
+              encrypt your .env files with end-to-end encryption, easy CI/CD
+              integration, and a tiny CLI that just works.
+            </Text>
 
-      {/* Features Section */}
-      <section className="snap-start bg-gray-50 px-6 py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold">Features</h2>
-            <p className="text-xl text-gray-600">
-              Everything you need to manage environment variables at scale
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((feature, idx) => (
-              <motion.div
-                key={idx}
-                className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-              >
-                <div className="mb-4 text-3xl">{feature.icon}</div>
-                <h3 className="mb-2 text-xl font-semibold">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="flex flex-wrap gap-3">
+              <PrimaryButton onClick={() => (location.hash = "#quickstart")}>
+                Quickstart
+              </PrimaryButton>
+              <GhostButton onClick={() => (location.href = "/docs")}>
+                Docs
+              </GhostButton>
+              <code className="flex items-center gap-2 rounded bg-slate-100 px-3 py-2 text-sm text-slate-700">
+                <span className="text-slate-500">npm i -g envkit</span>
+              </code>
+            </div>
 
-      {/* Why Section */}
-      <section className="snap-start bg-white px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold">Why EnvKit?</h2>
-            <p className="text-xl text-gray-600">
-              The problems we solve for development teams
-            </p>
-          </div>
-          <div className="space-y-12">
-            {WHY_REASONS.map((reason, idx) => (
-              <motion.div
-                key={idx}
-                className="flex flex-col items-start gap-6 md:flex-row"
-                initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-              >
-                <div className="md:w-1/3">
-                  <h3 className="mb-2 text-2xl font-semibold text-blue-600">
-                    {reason.title}
-                  </h3>
-                </div>
-                <div className="md:w-2/3">
-                  <p className="text-lg text-gray-700">{reason.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="mt-6 flex items-center gap-3 text-sm text-slate-500">
+              <span className="rounded bg-indigo-50 px-2 py-1 text-indigo-600">
+                Open source
+              </span>
+              <span>·</span>
+              <span>Zero-knowledge encryption option</span>
+              <span>·</span>
+              <span>Works offline</span>
+            </div>
+          </motion.div>
 
-      {/* CLI Flow Sections */}
-      <section id="cli-flow-steps" className="bg-gray-50">
-        {CLI_STEPS.map((step, idx) => (
-          <section
-            key={idx}
-            className="flex w-full snap-start flex-col items-center justify-center px-6 py-20 md:flex-row"
+          <motion.div
+            initial={{ scale: 0.98, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full"
           >
-            <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-12 md:flex-row">
-              <div className="w-full flex-1">
-                <div className="mb-6">
-                  <h3 className="mb-2 text-3xl font-bold">{step.title}</h3>
-                  <p className="text-lg text-gray-700">{step.description}</p>
-                  <p className="mt-4 text-sm text-gray-500">{step.outcome}</p>
+            <Card className="overflow-hidden shadow-lg">
+              <div className="bg-gradient-to-b from-white to-slate-50 p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-100 font-medium text-slate-600">
+                      .
+                    </div>
+                    <div className="text-sm font-medium">envkit CLI</div>
+                  </div>
+                  <div className="text-xs text-slate-400">Local preview</div>
                 </div>
-                <div className="overflow-hidden rounded-lg border border-gray-400 bg-blue-200 shadow-sm">
-                  <SyntaxHighlighter
-                    language="plaintext"
-                    style={vs}
-                    showLineNumbers={false}
-                    customStyle={{
-                      margin: 0,
-                      padding: "1rem 1.25rem",
-                      fontSize: "14px",
-                      background: "transparent", // let container bg show
-                    }}
-                  >
-                    {step.code}
-                  </SyntaxHighlighter>
+
+                <div className="rounded-md bg-slate-900 p-4 font-mono text-sm text-slate-100">
+                  <pre className="break-words whitespace-pre-wrap">{`# link project
+envkit init
+
+# authenticate
+envkit auth login
+
+# pull production env
+envkit vars pull --use-linked --env production
+
+# push a local .env
+envkit vars push .env.production production --branch main`}</pre>
+                </div>
+                <div className="mt-4 text-xs text-slate-500">
+                  Works with GitHub/GitLab, S3, or custom backends
                 </div>
               </div>
-            </div>
-          </section>
-        ))}
-      </section>
+            </Card>
+          </motion.div>
+        </section>
 
-      {/* Pricing Section */}
-      <section className="snap-start bg-gradient-to-br from-blue-50 to-purple-100 px-6 py-20">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-4 text-4xl font-bold">Absurdly Simple Pricing</h2>
-          <p className="mb-12 text-xl text-gray-700">
-            Start free, scale as you grow
-          </p>
+        {/* Features */}
+        <section id="features" className="mb-16">
+          <Heading size="lg" className="mb-6 text-2xl font-bold">
+            Features that make envkit useful
+          </Heading>
 
-          <div className="mx-auto max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-            <div className="mb-6">
-              <h3 className="mb-2 text-2xl font-semibold">Pay Per Use</h3>
-              <p className="text-gray-600">No monthly fees, no commitments</p>
-            </div>
-
-            <div className="mb-8">
-              <div className="mb-2 text-5xl font-bold">
-                <span className="text-green-600">100</span>
-                <span className="text-2xl text-gray-500"> read/writes</span>
-              </div>
-              <p className="text-lg text-gray-700">Free every day</p>
-            </div>
-
-            <div className="border-t border-gray-200 pt-6">
-              <div className="mb-2 text-2xl font-semibold">
-                <span className="text-blue-600">$0.001</span>
-                <span className="text-sm text-gray-500">
-                  {" "}
-                  per extra read/write
-                </span>
-              </div>
-              <p className="text-sm text-gray-600">
-                Only pay for what you use beyond the free tier
-              </p>
-            </div>
-
-            <div className="mt-8 rounded-lg bg-gray-50 p-4">
-              <p className="text-sm text-gray-700">
-                <strong>Example:</strong> 1,000 daily operations = $0.90/day
-              </p>
-            </div>
-
-            <Link
-              href="/dashboard"
-              className="mt-8 block w-full rounded-full bg-blue-500 px-6 py-3 font-semibold text-white hover:bg-blue-400"
-            >
-              Start for Free
-            </Link>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <FeatureCard
+              title="End-to-end encryption"
+              desc="AES-GCM-backed encryption with per-user keys or server-managed envelope keys. Zero-knowledge option available."
+              icon={<Lock className="h-5 w-5" />}
+            />
+            <FeatureCard
+              title="Simple CLI"
+              desc="Minimal commands for common workflows: init, auth, project, vars — built with ergonomics in mind."
+              icon={<Terminal className="h-5 w-5" />}
+            />
+            <FeatureCard
+              title="Team sync"
+              desc="Encrypted sync to cloud stores with role-based sharing and per-device keys."
+              icon={<Users className="h-5 w-5" />}
+            />
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="snap-start bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-20 text-white">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mb-4 text-4xl font-bold">
-            Ready to Simplify Your Environment Variables?
-          </h2>
-          <p className="mb-8 text-xl">
-            Join thousands of developers who've streamlined their workflow with
-            EnvKit
-          </p>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link
-              href="/dashboard"
-              className="rounded-full bg-white px-8 py-3 font-semibold text-blue-600 hover:bg-gray-100"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="#cli-flow-steps"
-              className="rounded-full border-2 border-white px-8 py-3 font-semibold text-white hover:bg-white hover:text-blue-600"
-            >
-              See How It Works
-            </Link>
+        {/* CLI Quickstart aligned with repo commands */}
+        <section id="quickstart" className="mb-16">
+          <Heading size="lg" className="mb-4 text-2xl font-bold">
+            CLI Quickstart
+          </Heading>
+          <Text className="mb-6 text-slate-600">
+            The snippets below mirror the actual CLI in this repository.
+          </Text>
+
+          <div className="space-y-8">
+            {/* Top-level program and init */}
+            <CommandCard
+              title="Initialize and link project"
+              subtitle="Defined in src/index.ts"
+              snippet={`# Initialize in your repo directory
+envkit init
+
+# If no existing project is linked:
+# - Create new project or select existing
+# - Adds .envkit/* to .gitignore
+# After linking, pull or push variables:
+envkit vars pull
+envkit vars push .env.development development`}
+              notes={[
+                "Subcommand: init",
+                "Adds linked project metadata to .envkit/",
+                "See src/index.ts for flows (create/select project, link, gitignore).",
+              ]}
+            />
+
+            {/* Auth */}
+            <CommandCard
+              title="Authenticate"
+              subtitle="Defined in src/commands/auth.ts"
+              snippet={`# Start local auth flow (opens browser)
+envkit auth login
+
+# End session
+envkit auth logout`}
+              notes={[
+                "Subcommand: auth",
+                "Commands: login, logout",
+                "Opens browser to complete device session; stores token locally.",
+              ]}
+            />
+
+            {/* Projects */}
+            <CommandCard
+              title="Manage projects"
+              subtitle="Defined in src/commands/projects.ts"
+              snippet={`# List projects
+envkit project list
+
+# Create a project
+envkit project create <name>
+
+# Link to current workspace (interactive selection)
+envkit project link
+
+# Unlink
+envkit project unlink
+
+# Rename
+envkit project rename <newName>
+
+# Delete (with optional --force to also delete variables)
+envkit project delete --force
+
+# Show currently linked project
+envkit project current`}
+              notes={[
+                "Subcommand: project",
+                "Actions: list, create, link, unlink, rename, delete, current",
+              ]}
+            />
+
+            {/* Variables List/Get */}
+            <CommandCard
+              title="List and get variables"
+              subtitle="Defined in src/commands/variables.ts"
+              snippet={`# List variables for a stage (development|staging|production)
+envkit vars list -e development
+
+# Show values (hidden by default)
+envkit vars list -e production --show
+
+# JSON output for scripting
+envkit vars list -e staging --json
+
+# Get a single variable (redacted by default)
+envkit vars get API_KEY -e production
+
+# Get value without redaction
+envkit vars get API_KEY -e production --redact=false`}
+              notes={[
+                "Subcommand: vars",
+                "Flags: -e/--env, --show, --json, --redact",
+                "Stages: development | staging | production",
+              ]}
+            />
+
+            {/* Variables Set */}
+            <CommandCard
+              title="Set (create or update) a variable"
+              subtitle="Defined in src/commands/variables.ts"
+              snippet={`# Set or update a variable value
+envkit vars set API_URL https://api.example.com -e development --branch main`}
+              notes={[
+                "Upsert behavior: create or update if exists (interactive confirm on update).",
+                "Flags: -e/--env, --branch (default: main).",
+                "Local cache for linked project is updated after set.",
+              ]}
+            />
+
+            {/* Push/Pull */}
+            <CommandCard
+              title="Push and pull from .env files"
+              subtitle="Defined in src/commands/variables.ts"
+              snippet={`# Push variables from a file to a stage
+envkit vars push .env.production production --branch main
+
+# Pull variables for a stage to local cache and .env.<stage>
+# Prefer linked project
+envkit vars pull --use-linked --env production
+
+# Or interactively select project and stage
+envkit vars pull`}
+              notes={[
+                "Push: envfile + stage required; --branch optional (default main).",
+                "Pull: --use-linked to skip selection; -e/--env to pick stage.",
+                "Pull can create or append/overwrite .env.<stage> with a backup if overwritten.",
+              ]}
+            />
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Pricing (placeholder) */}
+        <section id="pricing" className="mb-16">
+          <Heading size="lg" className="mb-4 text-2xl font-bold">
+            Pricing
+          </Heading>
+          <Text className="text-slate-600">
+            Coming soon. Envkit is open-source; core features are free.
+          </Text>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-100 pt-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-slate-500">
+              © {new Date().getFullYear()} envkit — Secure environment variable
+              manager
+            </div>
+            <div className="flex items-center gap-4">
+              <a
+                className="text-sm text-slate-500 hover:text-slate-700"
+                href="/privacy"
+              >
+                Privacy
+              </a>
+              <a
+                className="text-sm text-slate-500 hover:text-slate-700"
+                href="/terms"
+              >
+                Terms
+              </a>
+            </div>
+          </div>
+        </footer>
+      </div>
     </main>
+  );
+}
+
+function FeatureCard({
+  title,
+  desc,
+  icon,
+}: {
+  title: string;
+  desc: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <Card className="p-6 transition-shadow hover:shadow-md">
+      <CardContent>
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded bg-indigo-50 text-indigo-600">
+            {icon}
+          </div>
+          <div>
+            <div className="font-semibold">{title}</div>
+            <div className="text-sm text-slate-500">{desc}</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          <GhostButton className="px-0 text-indigo-600">
+            Learn more →
+          </GhostButton>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CommandCard({
+  title,
+  subtitle,
+  snippet,
+  notes,
+}: {
+  title: string;
+  subtitle?: string;
+  snippet: string;
+  notes?: string[];
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold">{title}</div>
+          {subtitle ? (
+            <div className="text-xs text-slate-500">{subtitle}</div>
+          ) : null}
+        </div>
+      </div>
+      <div className="rounded-md bg-slate-900 p-4 font-mono text-xs leading-relaxed text-slate-100">
+        <pre className="break-words whitespace-pre-wrap">{snippet}</pre>
+      </div>
+      {notes && notes.length > 0 ? (
+        <ul className="mt-3 list-disc pl-5 text-xs text-slate-500">
+          {notes.map((n, i) => (
+            <li key={i}>{n}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
